@@ -10,6 +10,8 @@ declare class IPCIDR {
 
   end<T = IPCIDR.FormatResult>(options?: IPCIDR.FormatOptions): T;
 
+  random<T = IPCIDR.FormatResult>(options?: IPCIDR.FormatOptions): T;
+
   toRange<T = IPCIDR.FormatResult>(options?: IPCIDR.FormatOptions): [T, T];
 
   loop<T = IPCIDR.FormatResult, R = any>(fn: (ip: T) => Promise<R>, options: IPCIDR.FormatOptions, results?: IPCIDR.ChunkInfo): Promise<R>[];
@@ -19,6 +21,8 @@ declare class IPCIDR {
   contains(address: IPCIDR.Address | string): boolean;
 
   isValid(): boolean;
+
+  count(asInteger?: boolean): number | BigInteger;
 
   toString(): string;
 

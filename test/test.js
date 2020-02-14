@@ -10,6 +10,9 @@ let validCIDRClear = '5.5.5.8';
 let validCIDRStart = '5.5.5.8';
 let validCIDREnd = '5.5.5.15';
 
+let v6CIDR = '2602:306:3433:c000::/50';
+let v6CIDRCount = '302231454903657293676544';
+
 let validRange = [
   '5.5.5.8',
   '5.5.5.9',
@@ -54,40 +57,86 @@ describe('IPCIDR:', function () {
     });
   });
 
+  describe('.count()', function() {
+    it('returns the number of ips in the range', function() {
+      let cidr = new IPCIDR(validCIDR);
+      assert.notEqual('number', typeof(cidr.count()));
+      assert.isTrue(cidr.count().equals(new BigInteger('8')));
+    });
+
+    it('returns the number of ips in large ranges', function() {
+      let cidr = new IPCIDR(v6CIDR);
+      assert.isTrue(cidr.count().equals(new BigInteger(v6CIDRCount)));
+    });
+
+    it('returns an integer count', function() {
+      let cidr = new IPCIDR(validCIDR);
+      assert.equal('number', typeof(cidr.count(true)));
+      assert.equal(cidr.count(true), 8);
+    });
+
+    it('returns -1 for integer overflow', function() {
+      let cidr = new IPCIDR(v6CIDR);
+      assert.equal('number', typeof(cidr.count(true)));
+      assert.equal(cidr.count(true), -1);
+    });
+  });
+
+  describe('.random()', function() {
+    it('returns random ips', function() {
+      let cidr = new IPCIDR(validCIDR);
+      let ips = {};
+      for (let i = 0; i < 100; i++) {
+        ips[cidr.random()] = true;
+      }
+      assert.equal(Object.keys(ips).length, validRange.length);
+      for (let ip in ips) {
+        assert.isTrue(validRange.indexOf(ip) > -1);
+      }
+    });
+
+    it('returns pseudo-random ipv6 ips', function() {
+      let cidr = new IPCIDR(v6CIDR);
+      for (let i = 0; i < 100; i++) {
+        assert.isTrue(cidr.contains(cidr.random()));
+      }
+    })
+  });
+
   describe(".contains()", function () {
     describe("check as string", function () {
       it('should be true', function () {
         let cidr = new IPCIDR(validCIDR);
-        assert.isTrue(cidr.contains('5.5.5.15'));      
+        assert.isTrue(cidr.contains('5.5.5.15'));
       });
 
       it('should be false', function () {
         let cidr = new IPCIDR(validCIDR);
-        assert.isFalse(cidr.contains('5.5.5.16'));      
+        assert.isFalse(cidr.contains('5.5.5.16'));
       });
     });
 
     describe("check as big integer", function () {
       it('should be true', function () {
         let cidr = new IPCIDR(validCIDR);
-        assert.isTrue(cidr.contains(new BigInteger('84215055')));      
+        assert.isTrue(cidr.contains(new BigInteger('84215055')));
       });
 
       it('should be false', function () {
         let cidr = new IPCIDR(validCIDR);
-        assert.isFalse(cidr.contains(new BigInteger('84215056')));      
+        assert.isFalse(cidr.contains(new BigInteger('84215056')));
       });
     });
 
     describe("check as object", function () {
       it('should be true', function () {
         let cidr = new IPCIDR(validCIDR);
-        assert.isTrue(cidr.contains(new ipAddress.Address4('5.5.5.15')));      
+        assert.isTrue(cidr.contains(new ipAddress.Address4('5.5.5.15')));
       });
 
       it('should be false', function () {
         let cidr = new IPCIDR(validCIDR);
-        assert.isFalse(cidr.contains(new ipAddress.Address4('5.5.5.16')));      
+        assert.isFalse(cidr.contains(new ipAddress.Address4('5.5.5.16')));
       });
     });
   });
@@ -134,7 +183,7 @@ describe('IPCIDR:', function () {
       let cidr = new IPCIDR(validCIDR);
       let results = {};
       let options = { from: 3, limit: new BigInteger('10') };
-      let array = cidr.toArray(options, results);      
+      let array = cidr.toArray(options, results);
       assert.equal(results.from.intValue(), options.from);
       assert.equal(results.to.intValue(), results.length.intValue());
       assert.equal(array.length, 5);
@@ -172,4 +221,3 @@ describe('IPCIDR:', function () {
     });
   })
 });
-

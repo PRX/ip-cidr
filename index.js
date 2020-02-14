@@ -45,7 +45,7 @@ class IPCIDR {
         address = new this.ipAddressType(address);
       }
     }
-    
+
     return address.isInSubnet(this.address)
   }
 
@@ -55,6 +55,40 @@ class IPCIDR {
 
   end(options) {
     return this.formatIP(this.addressEnd, options);
+  }
+
+  count(asInteger) {
+    if (this.isValid()) {
+      let start = this.addressStart.bigInteger();
+      let end = this.addressEnd.bigInteger();
+      let count = end.subtract(start).add(new BigInteger('1'));
+      if (asInteger) {
+        if (count.compareTo(new BigInteger('' + Number.MAX_SAFE_INTEGER)) <= 0) {
+          return parseInt(count.toString(), 10);
+        } else {
+          return -1;
+        }
+      } else {
+        return count;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  random(options) {
+    if (this.isValid()) {
+      let start = this.addressStart.bigInteger();
+      let count = this.count();
+
+      // TODO: jsbn doesn't have random
+      count = count.min(new BigInteger('' + Number.MAX_SAFE_INTEGER));
+      let offset = Math.floor(Math.random() * parseInt(count.toString(), 10));
+      let randomish = start.add(new BigInteger('' + offset));
+      return this.formatIP(this.ipAddressType.fromBigInteger(randomish), options);
+    } else {
+      return null;
+    }
   }
 
   toString() {
@@ -92,7 +126,7 @@ class IPCIDR {
 
     return list;
   }
-  
+
   loop(fn, options, results) {
     options = options || {};
 
@@ -101,7 +135,7 @@ class IPCIDR {
     let end = this.addressEnd.bigInteger();
     let length = end.subtract(start).add(new BigInteger('1'));
     let info = this.getChunkInfo(length, options);
-    
+
     if(results)  {
       Object.assign(results, info);
     }
@@ -148,11 +182,11 @@ class IPCIDR {
     }
 
     maxLength = length.subtract(from);
-    
+
     if(limit.compareTo(maxLength) > 0) {
       limit = maxLength;
     }
-    
+
     to = from.add(limit);
 
     return {

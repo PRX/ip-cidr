@@ -8,26 +8,26 @@ Module for working with CIDR (v4, v6). Based on [ip-address](https://github.com/
 
 ```js
 const IPCIDR = require("ip-cidr");
-const cidr = new IPCIDR("50.165.190.0/23"); 
+const cidr = new IPCIDR("50.165.190.0/23");
 
 if(!cidr.isValid()) {
   throw new Error('CIDR is invalid');
 }
 
 // get start ip address as a string
-cidr.start(); 
+cidr.start();
 
 // get end ip address as a big integer
-cidr.end({ type: "bigInteger" }); 
+cidr.end({ type: "bigInteger" });
 
 // do something with each element of the range  
 cidr.loop(ip => console.log(ip), { type: "addressObject" });
 
 // get an array of all ip addresses in the range as a big integer;
-cidr.toArray({ type: "bigInteger" }); 
+cidr.toArray({ type: "bigInteger" });
 
 // get an array of start and end ip addresses as a string [startIpAsString, endIpAsString]
-cidr.toRange(); 
+cidr.toRange();
 ```
 
 ## Client side
@@ -35,7 +35,7 @@ Load __/dist/ip-cidr.js__ as a script and you can get the library in __window.IP
 
 # API  
 ### .formatIP(address, [options])  
-to return an "ip-address" module object in the necessary format 
+to return an "ip-address" module object in the necessary format
 
 ### .contains(address)  
 to check the address belongs to the range
@@ -45,6 +45,13 @@ to get the start ip adress
 
 ### .end([options])  
 to get the end ip address
+
+### .count([asInteger])
+to get the number of ips in the range, optionally as an integer instead of a
+bigint.  integer overflow will return -1.
+
+### .random()
+to get a random ip in the range
 
 ### .toString()   
 to convert the cidr to a string like "50.165.190.0/23"
@@ -64,6 +71,3 @@ you can pass the second argument "results" (object) to get all chunk pagination 
 ### .loop(fn, [options], [results])  
 to run __fn__ for each element of the range  
 you can use the same chunk options as in __.toArray()__
-
-
-
